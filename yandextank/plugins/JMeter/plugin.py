@@ -8,9 +8,11 @@ import time
 import socket
 import re
 import shlex
+import shutil
 import requests
 
 from pkg_resources import resource_string
+from netort.resource import HttpOpener, manager as resource
 
 from .reader import JMeterReader
 from ..Console import Plugin as ConsolePlugin
@@ -101,15 +103,15 @@ class Plugin(GeneratorPlugin):
             url = dep['url']
             filename = dep['filename']
             try:
-                resp = requests.get(url)
-                resp.raise_for_status()
+                opener = resource.get_opener(url, force_download=True)
             except requests.RequestException:
                 logger.exception('')
                 raise RuntimeError('Failed to download jmeter dependency from %s' % url)
             else:
                 filepath = self.core.mkstemp('', filename)
-                with open(filepath, 'w') as f:
-                    f.write(resp.content)
+                if isinstance(opener, HttpOpener):
+                    downloaded_file = opener.download_file()
+                    shutil.move(downloaded_file, filepath)
                 self.jmeter_dependencies_paths.append(filepath)
         self.args = [
             self.jmeter_path, "-n", "-t", self.jmx, '-j', self.jmeter_log,
