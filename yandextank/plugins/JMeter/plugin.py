@@ -8,6 +8,7 @@ import time
 import socket
 import re
 import shlex
+import requests
 
 from pkg_resources import resource_string
 
@@ -42,6 +43,8 @@ class Plugin(GeneratorPlugin):
         self.start_time = time.time()
         self.jmeter_buffer_size = None
         self.jmeter_udp_port = None
+        self.jmeter_dependencies = None
+        self.jmeter_dependencies_paths = []
         self.shutdown_timeout = None
 
     @staticmethod
@@ -57,6 +60,7 @@ class Plugin(GeneratorPlugin):
     def configure(self):
         self.original_jmx = self.get_option("jmx")
         self.core.add_artifact_file(self.original_jmx, True)
+        self.jmeter_dependencies = self.get_option('dependencies')
         self.jtl_file = self.core.mkstemp('.jtl', 'jmeter_')
         self.core.add_artifact_file(self.jtl_file)
         self.user_args = self.get_option("args", '')
@@ -93,6 +97,20 @@ class Plugin(GeneratorPlugin):
         return self.stats_reader
 
     def prepare_test(self):
+        for dep in self.jmeter_dependencies:
+            url = dep['url']
+            filename = dep['filename']
+            try:
+                resp = requests.get(url)
+                resp.raise_for_status()
+            except requests.RequestException:
+                logger.exception('')
+                raise RuntimeError('Failed to download jmeter dependency from %s' % url)
+            else:
+                filepath = self.core.mkstemp('', filename)
+                with open(filepath, 'w') as f:
+                    f.write(resp.content)
+                self.jmeter_dependencies_paths.append(filepath)
         self.args = [
             self.jmeter_path, "-n", "-t", self.jmx, '-j', self.jmeter_log,
             '-Jjmeter.save.saveservice.default_delimiter=\\t',
@@ -164,6 +182,14 @@ class Plugin(GeneratorPlugin):
         if self.process_stderr:
             self.process_stderr.close()
         self.core.add_artifact_file(self.jmeter_log)
+        return retcode
+
+    def post_process(self, retcode):
+        for path in self.jmeter_dependencies_paths:
+            try:
+                os.remove(path)
+            except Exception as e:
+                logger.error('%s: Failed to remove jmeter dependency at %s', repr(e), path)
         return retcode
 
     def __discover_jmeter_udp_port(self):
