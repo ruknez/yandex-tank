@@ -191,13 +191,13 @@ class Plugin(GeneratorPlugin):
         self.core.add_artifact_file(self.jmeter_log)
         return retcode
 
-    # def post_process(self, retcode):
-    #     for path in self.jmeter_dependencies_paths:
-    #         try:
-    #             os.remove(path)
-    #         except Exception as e:
-    #             logger.error('%s: Failed to remove jmeter dependency at %s', repr(e), path)
-    #     return retcode
+    def post_process(self, retcode):
+        for path in self.jmeter_dependencies_paths:
+            try:
+                os.remove(path)
+            except Exception as e:
+                logger.error('%s: Failed to remove jmeter dependency at %s', repr(e), path)
+        return retcode
 
     def __discover_jmeter_udp_port(self):
         """Searching for line in jmeter.log such as
