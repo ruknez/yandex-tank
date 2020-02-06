@@ -108,15 +108,20 @@ class Plugin(GeneratorPlugin):
                 logger.exception('')
                 raise RuntimeError('Failed to download jmeter dependency from %s' % url)
             else:
-                filepath = self.core.mkstemp('', filename)
+                filepath = self.core.artifacts_dir + '/' + filename
+                with open(filepath, 'w'):
+                    pass
+                # Подразумевается, что зависимости будут скачиваться с удаленного ресурса.
+                # Если надо поддержать что-то еще, например локальные файлы, welcome
                 if isinstance(opener, HttpOpener):
-                    downloaded_file = opener.download_file()
+                    downloaded_file = opener.download_file(use_cache=True)
                     shutil.move(downloaded_file, filepath)
                 self.jmeter_dependencies_paths.append(filepath)
         self.args = [
             self.jmeter_path, "-n", "-t", self.jmx, '-j', self.jmeter_log,
-            '-Jjmeter.save.saveservice.default_delimiter=\\t',
-            '-Jjmeter.save.saveservice.connect_time=true'
+            '-J', 'JMETER_HOME=%s' % self.core.artifacts_dir,
+            '-J', 'jmeter.save.saveservice.default_delimiter=\\t',
+            '-J', 'jmeter.save.saveservice.connect_time=true'
         ]
         self.args += shlex.split(self.user_args)
 
@@ -186,13 +191,13 @@ class Plugin(GeneratorPlugin):
         self.core.add_artifact_file(self.jmeter_log)
         return retcode
 
-    def post_process(self, retcode):
-        for path in self.jmeter_dependencies_paths:
-            try:
-                os.remove(path)
-            except Exception as e:
-                logger.error('%s: Failed to remove jmeter dependency at %s', repr(e), path)
-        return retcode
+    # def post_process(self, retcode):
+    #     for path in self.jmeter_dependencies_paths:
+    #         try:
+    #             os.remove(path)
+    #         except Exception as e:
+    #             logger.error('%s: Failed to remove jmeter dependency at %s', repr(e), path)
+    #     return retcode
 
     def __discover_jmeter_udp_port(self):
         """Searching for line in jmeter.log such as
@@ -226,10 +231,8 @@ class Plugin(GeneratorPlugin):
 
     def __add_jmeter_components(self, jmx, jtl, variables):
         """ Genius idea by Alexey Lavrenyuk """
-        logger.debug("Original JMX: %s", os.path.realpath(jmx))
-        with open(jmx, 'r') as src_jmx:
-            source_lines = src_jmx.readlines()
-
+        with resource.get_opener(jmx)() as src_jmx:
+            source_lines = [l.decode('utf-8') for l in src_jmx.readlines()]
         try:
             # In new Jmeter version (3.2 as example) WorkBench's plugin checkbox enabled by default
             # It totally crashes Yandex tank injection and raises XML Parse Exception
