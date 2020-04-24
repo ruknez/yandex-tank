@@ -4,6 +4,7 @@ import subprocess
 import time
 import os
 from threading import Event
+import shutil
 
 import yaml
 import json
@@ -63,6 +64,8 @@ class Plugin(GeneratorPlugin):
             self.pandora_cmd = resource_manager.resource_filename(pandora_path)
             os.chmod(self.pandora_cmd, 0o755)
         else:
+            if shutil.which(pandora_path) is None:
+                raise RuntimeError("Pandora binary does not exist at %s" % pandora_path)
             self.pandora_cmd = pandora_path
         self.buffered_seconds = self.get_option("buffered_seconds")
         self.affinity = self.get_option("affinity", "")
@@ -231,7 +234,7 @@ class Plugin(GeneratorPlugin):
             logger.debug(
                 "Unable to start Pandora binary. Args: %s", args, exc_info=True)
             raise RuntimeError(
-                "Unable to start Pandora binary and/or file does not exist: %s" % args)
+                "Unable to start Pandora binary. Args: %s" % args)
 
     def is_test_finished(self):
         retcode = self.process.poll()
@@ -255,7 +258,7 @@ class Plugin(GeneratorPlugin):
                         break
                     if '\tERROR\t' in line:
                         try:
-                            err = json.loads(line.split('\t')[-1])
+                            err = json.loads(line.split('\t')[-1])['error']
                         except:
                             err = line
                     elif '\tFATAL\t' in line and fatal is None:
@@ -294,7 +297,6 @@ class Plugin(GeneratorPlugin):
         if self.get_option('delete_report'):
             if self.sample_log in self.core.artifact_files:
                 del self.core.artifact_files[self.sample_log]
-            os.remove(self.sample_log)
         return retcode
 
 
