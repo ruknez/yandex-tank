@@ -129,6 +129,8 @@ def string_to_df(data):
     chunk['connect_time'] = (chunk['connect_time'].fillna(0) * 1000).astype(np.int64)
     chunk['latency'] = chunk['latency'] * 1000
     chunk['latency'] = chunk.apply(fix_latency, axis=1)
+    # FIXME:
+    chunk['interval_real'] = chunk['latency']
     chunk['send_time'] = np.zeros(chunk_length)
     chunk['receive_time'] = chunk['interval_real'] - \
         chunk['latency'] - chunk['connect_time']
