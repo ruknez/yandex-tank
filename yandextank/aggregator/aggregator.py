@@ -161,13 +161,16 @@ class Aggregator(object):
             result = {
                 "ts": ts,
                 "tagged":
-                {tag: {code: self.worker.aggregate(data)
-                 for code, data in list(data.groupby("proto_code"))}
+                {tag: self.worker.aggregate(data)
                  for tag, data in by_tag},
                 "overall": self.worker.aggregate(chunk),
-                "counted_rps": rps
+                "counted_rps": rps,
+                "TmpTest":
+                {tag: {code: self.worker.aggregate(data)
+                for code, data in list(data.groupby("proto_code"))}
+                for tag, data in by_tag}
             }
-            #logger.warning("Aggregator by_tag = %s" % by_tag)
+            logger.warning("Aggregator result = %s" % result)
 
             logger.debug(
                 "Aggregation time: %.2fms", (time.time() - start_time) * 1000)
