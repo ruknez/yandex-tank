@@ -150,7 +150,7 @@ class Aggregator(object):
     def __iter__(self):
         for ts, chunk, rps in self.source:
             logger.warning("Aggregator chunk = %s" % chunk)
-            by_tag = list(chunk.groupby([self.groupby]))
+            by_tag = list(chunk.groupby([self.groupby, "proto_code"]))
 
             start_time = time.time()
             result = {
