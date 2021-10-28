@@ -151,6 +151,11 @@ class Aggregator(object):
         for ts, chunk, rps in self.source:
             logger.warning("Aggregator chunk = %s" % chunk)
             by_tag = list(chunk.groupby([self.groupby]))
+            for tag, data in by_tag:
+                logger.warning("Aggregator by_tag tag = %s" % tag)
+                logger.warning("Aggregator by_tag data = %s" % data)
+                logger.warning("\n")
+
 
             start_time = time.time()
             result = {
@@ -162,7 +167,7 @@ class Aggregator(object):
                 "overall": self.worker.aggregate(chunk),
                 "counted_rps": rps
             }
-            logger.warning("Aggregator by_tag = %s" % by_tag)
+            #logger.warning("Aggregator by_tag = %s" % by_tag)
 
             logger.debug(
                 "Aggregation time: %.2fms", (time.time() - start_time) * 1000)
