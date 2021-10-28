@@ -160,16 +160,11 @@ class Aggregator(object):
         self.worker = Worker(config, verbose_histogram)
         self.source = source
         self.groupby = 'tag'
+        self.groupbyprotocode = 'proto_code'
 
     def __iter__(self):
         for ts, chunk, rps in self.source:
-            logger.warning("Aggregator chunk = %s" % chunk)
             by_tag = list(chunk.groupby([self.groupby]))
-            for tag, data in by_tag:
-                logger.warning("Aggregator by_tag tag = %s" % tag)
-                logger.warning("Aggregator by_tag data = %s" % data)
-                logger.warning("\n")
-
 
             start_time = time.time()
             result = {
@@ -179,9 +174,9 @@ class Aggregator(object):
                  for tag, data in by_tag},
                 "overall": self.worker.aggregate(chunk),
                 "counted_rps": rps,
-                "TmpTest":
+                "groupProtoCode":
                 {tag: {code: self.worker.aggregate_proto_code(data)
-                       for code, data in list(data.groupby("proto_code"))}
+                       for code, data in list(data.groupby([self.groupbyprotocode]))}
                     for tag, data in by_tag}
             }
             logger.warning("Aggregator result = %s" % result)
