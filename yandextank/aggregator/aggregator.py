@@ -60,6 +60,7 @@ class Worker(object):
 
         self.bins = bins
         self.percentiles = np.array([50, 75, 80, 85, 90, 95, 98, 99, 100])
+        logger.warning("Worker self.config = %s" % config)
         self.config = config
         self.aggregators = {
             "hist": self._histogram,
