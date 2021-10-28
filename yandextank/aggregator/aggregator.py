@@ -75,6 +75,7 @@ class Worker(object):
     def _histogram(self, series):
         data, bins = np.histogram(series, bins=self.bins)
         mask = data > 0
+        logger.warning('aggregator _histogram')
         return {
             "data": [e.item() for e in data[mask]],
             "bins": [e.item() for e in bins[1:][mask]],
