@@ -137,4 +137,6 @@ class TankAggregator(object):
     def __notify_listeners(self, data, stats):
         """ notify all listeners about aggregate data and stats """
         for listener in self.listeners:
+            logger.warning("tanck aggregator listener = %s" % listener)
+        for listener in self.listeners:
             listener.on_aggregated_data(data, stats)
