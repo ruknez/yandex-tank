@@ -62,6 +62,11 @@ class Worker(object):
         self.percentiles = np.array([50, 75, 80, 85, 90, 95, 98, 99, 100])
         logger.warning("Worker self.config = %s" % config)
         self.config = config
+        self.protoConfig = {
+            "interval_real": ["total", "max", "min", "hist", "q", "len"],
+            "net_code": ["count"],
+            "proto_code": ["count"]
+        }
         self.aggregators = {
             "hist": self._histogram,
             "q": self._quantiles,
@@ -115,8 +120,17 @@ class Worker(object):
                 for aggregate in self.config[key]
             }
             for key in self.config
+        }
 
-
+    def aggregate_proto_code(self, data):
+        for key in self.protoConfig:
+            logger.warning("aggregator  aggregate_proto_code key = %s" % key)
+        return {
+            key: {
+                aggregate: self.aggregators.get(aggregate)(data[key])
+                for aggregate in self.protoConfig[key]
+            }
+            for key in self.protoConfig
         }
 
 
@@ -166,9 +180,9 @@ class Aggregator(object):
                 "overall": self.worker.aggregate(chunk),
                 "counted_rps": rps,
                 "TmpTest":
-                {tag: {code: self.worker.aggregate(data)
-                for code, data in list(data.groupby("proto_code"))}
-                for tag, data in by_tag}
+                {tag: {code: self.worker.aggregate_proto_code(data)
+                       for code, data in list(data.groupby("proto_code"))}
+                    for tag, data in by_tag}
             }
             logger.warning("Aggregator result = %s" % result)
 
