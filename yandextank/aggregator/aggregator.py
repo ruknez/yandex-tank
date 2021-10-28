@@ -107,8 +107,8 @@ class Worker(object):
         }
 
     def aggregate(self, data):
-        for  key in self.config:
-         logger.warning("aggregator  aggregate key = %s" % key)
+        for key in self.config:
+            logger.warning("aggregator  aggregate key = %s" % key)
         return {
             key: {
                 aggregate: self.aggregators.get(aggregate)(data[key])
