@@ -157,7 +157,7 @@ class Aggregator(object):
                 "ts": ts,
                 "tagged":
                 {tag: {code: self.worker.aggregate(data)
-                 for code, data in list(by_tag[tag].groupby("proto_code"))}
+                 for code, data in list(data.groupby("proto_code"))}
                  for tag, data in by_tag},
                 "overall": self.worker.aggregate(chunk),
                 "counted_rps": rps
