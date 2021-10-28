@@ -107,7 +107,8 @@ class Worker(object):
         }
 
     def aggregate(self, data):
-        logger.warning("aggregator  aggregate f")
+        for  key in self.config:
+         logger.warning("aggregator  aggregate key = %s" % key)
         return {
             key: {
                 aggregate: self.aggregators.get(aggregate)(data[key])
@@ -148,6 +149,7 @@ class Aggregator(object):
 
     def __iter__(self):
         for ts, chunk, rps in self.source:
+            logger.warning("Aggregator chunk = %s" % chunk)
             by_tag = list(chunk.groupby([self.groupby]))
 
             start_time = time.time()
