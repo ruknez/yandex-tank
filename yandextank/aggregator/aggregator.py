@@ -122,13 +122,8 @@ class Worker(object):
     def aggregate_proto_code(self, data):
         #for key in self.protoConfig:
         #    logger.warning("aggregator  aggregate_proto_code key = %s" % key)
-        return {
-            {
-             {self.aggregators.get(aggregate)(data[key])}
-             for aggregate in self.protoConfig[key]
-            }
-            for key in self.protoConfig
-        }
+        return self._histogram(data["interval_real"])
+
 
 
 class DataPoller(object):
@@ -172,7 +167,7 @@ class Aggregator(object):
                 "overall": self.worker.aggregate(chunk),
                 "counted_rps": rps,
                 "hist_by_proto-code":
-                {tag: {code: {self.worker.aggregate_proto_code(data)}
+                {tag: {code: self.worker.aggregate_proto_code(data)
                        for code, data in list(data.groupby([self.groupbyprotocode]))}
                     for tag, data in by_tag}
             }
