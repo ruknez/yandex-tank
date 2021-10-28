@@ -123,11 +123,8 @@ class Worker(object):
         #for key in self.protoConfig:
         #    logger.warning("aggregator  aggregate_proto_code key = %s" % key)
         return {
-            {
-                self.aggregators.get(aggregate)(data[key])
-                for aggregate in self.protoConfig[key]
-            }
-            for key in self.protoConfig
+                self.aggregators.get(aggregate)(data["interval_real"])
+                for aggregate in self.protoConfig["interval_real"]
         }
 
 
