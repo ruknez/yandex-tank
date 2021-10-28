@@ -107,6 +107,7 @@ class Worker(object):
         }
 
     def aggregate(self, data):
+        logger.warning("aggregator  aggregate f")
         return {
             key: {
                 aggregate: self.aggregators.get(aggregate)(data[key])
