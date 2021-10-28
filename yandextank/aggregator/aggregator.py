@@ -22,7 +22,7 @@ phantom_config = {
     "size_out": ["total", "max", "min", "len"],
     "size_in": ["total", "max", "min", "len"],
     "net_code": ["count"],
-    "proto_code": ["count", "hist"],
+    "proto_code": ["count11", "hist"],
 }
 
 
@@ -112,6 +112,8 @@ class Worker(object):
                 for aggregate in self.config[key]
             }
             for key in self.config
+
+
         }
 
 
@@ -145,6 +147,7 @@ class Aggregator(object):
     def __iter__(self):
         for ts, chunk, rps in self.source:
             by_tag = list(chunk.groupby([self.groupby]))
+
             start_time = time.time()
             result = {
                 "ts": ts,
@@ -154,6 +157,8 @@ class Aggregator(object):
                 "overall": self.worker.aggregate(chunk),
                 "counted_rps": rps
             }
+            logger.warning("Aggregator by_tag = %s" % by_tag)
+
             logger.debug(
                 "Aggregation time: %.2fms", (time.time() - start_time) * 1000)
             yield result
