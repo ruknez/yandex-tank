@@ -63,9 +63,7 @@ class Worker(object):
         logger.warning("Worker self.config = %s" % config)
         self.config = config
         self.protoConfig = {
-            "interval_real": ["total", "max", "min", "hist", "q", "len"],
-            "net_code": ["count"],
-            "proto_code": ["count"]
+            "interval_real": ["hist", "q", "len"],
         }
         self.aggregators = {
             "hist": self._histogram,
@@ -115,10 +113,8 @@ class Worker(object):
         for key in self.config:
             logger.warning("aggregator  aggregate key = %s" % key)
         return {
-            key: {
-                aggregate: self.aggregators.get(aggregate)(data[key])
-                for aggregate in self.config[key]
-            }
+            aggregate: self.aggregators.get(aggregate)(data[key])
+            for aggregate in self.config[key]
             for key in self.config
         }
 
