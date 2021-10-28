@@ -113,8 +113,10 @@ class Worker(object):
         for key in self.config:
             logger.warning("aggregator  aggregate key = %s" % key)
         return {
-            aggregate: self.aggregators.get(aggregate)(data[key])
-            for aggregate in self.config[key]
+            key: {
+                aggregate: self.aggregators.get(aggregate)(data[key])
+                for aggregate in self.config[key]
+            }
             for key in self.config
         }
 
@@ -122,10 +124,8 @@ class Worker(object):
         for key in self.protoConfig:
             logger.warning("aggregator  aggregate_proto_code key = %s" % key)
         return {
-            key: {
-                aggregate: self.aggregators.get(aggregate)(data[key])
-                for aggregate in self.protoConfig[key]
-            }
+            aggregate: self.aggregators.get(aggregate)(data[key])
+            for aggregate in self.protoConfig[key]
             for key in self.protoConfig
         }
 
