@@ -62,9 +62,7 @@ class Worker(object):
         self.percentiles = np.array([50, 75, 80, 85, 90, 95, 98, 99, 100])
         logger.warning("Worker self.config = %s" % config)
         self.config = config
-        self.protoConfig = {
-            "interval_real": ["hist"],
-        }
+        self.protoConfig = "interval_real"
         self.aggregators = {
             "hist": self._histogram,
             "q": self._quantiles,
@@ -109,8 +107,6 @@ class Worker(object):
         }
 
     def aggregate(self, data):
-        #for key in self.config:
-        #    logger.warning("aggregator  aggregate key = %s" % key)
         return {
             key: {
                 aggregate: self.aggregators.get(aggregate)(data[key])
@@ -120,10 +116,7 @@ class Worker(object):
         }
 
     def aggregate_proto_code(self, data):
-        #for key in self.protoConfig:
-        #    logger.warning("aggregator  aggregate_proto_code key = %s" % key)
-        return self._histogram(data["interval_real"])
-
+        return self._histogram(data[self.protoConfig])
 
 
 class DataPoller(object):
@@ -171,8 +164,6 @@ class Aggregator(object):
                        for code, data in list(data.groupby([self.groupbyprotocode]))}
                     for tag, data in by_tag}
             }
-            logger.warning("Aggregator result = %s" % result)
-
             logger.debug(
                 "Aggregation time: %.2fms", (time.time() - start_time) * 1000)
             yield result
