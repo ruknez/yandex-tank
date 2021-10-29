@@ -22,7 +22,7 @@ phantom_config = {
     "size_out": ["total", "max", "min", "len"],
     "size_in": ["total", "max", "min", "len"],
     "net_code": ["count"],
-    "proto_code": ["count11", "hist"],
+    "proto_code": ["count"],
 }
 
 
