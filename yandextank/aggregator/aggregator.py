@@ -81,6 +81,14 @@ class Worker(object):
             "bins": [e.item() for e in bins[1:][mask]],
         }
 
+    def _histogram_for_json(self, series):
+        data, bins = np.histogram(series, bins=self.bins)
+        mask = data > 0
+        return {
+            "data": [int(e.item()) for e in data[mask]],
+            "bins": [int(e.item()) for e in bins[1:][mask]],
+        }
+
     def _mean(self, series):
         return series.mean().item()
 
@@ -115,7 +123,7 @@ class Worker(object):
         }
 
     def aggregate_proto_code(self, data):
-        return self._histogram(data[self.protoConfig])
+        return self._histogram_for_json(data[self.protoConfig])
 
 
 class DataPoller(object):
