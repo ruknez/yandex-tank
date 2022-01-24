@@ -168,7 +168,7 @@ class Aggregator(object):
                 "counted_rps": rps,
                 "hist_by_proto-code":
                 {tag: {str(code): self.worker.aggregate_proto_code(data)
-                       for code, data in list(data.groupby([self.groupbyprotocode]))}
+                       for code, data in data.groupby([self.groupbyprotocode])}
                     for tag, data in by_tag}
             }
             logger.debug(
