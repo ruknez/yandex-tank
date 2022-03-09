@@ -183,10 +183,14 @@ class TankCore(object):
             self._artifacts_base_dir = artifacts_base_dir
         return self._artifacts_base_dir
 
-    def load_plugins(self):
+    def load_plugins(self, super_job_id):
         """
         Tells core to take plugin options and instantiate plugin classes
         """
+        if super_job_id is not None:
+            logger.info('yandex tank load_plugins super_job_id = %s' % super_job_id)
+            os.environ['SUPERJOB_ID_test'] = super_job_id
+
         logger.info(self.get_user_agent())
         logger.info('New test id %s' % self.test_id)
         logger.info("Loading plugins...")
