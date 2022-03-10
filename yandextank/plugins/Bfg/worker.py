@@ -176,9 +176,6 @@ class BFGMultiprocessing(BFGBase):
                     logger.debug("Got killer task.")
                     break
                 timestamp, missile, marker = task
-                logger.error("BFGMultiprocessing timestamp %s", timestamp)
-                logger.error("BFGMultiprocessing missile %s", missile)
-                logger.error("BFGMultiprocessing marker %s", marker)
                 planned_time = self.start_time + (timestamp / 1000.0)
                 delay = planned_time - time.time()
                 if delay > 0:
