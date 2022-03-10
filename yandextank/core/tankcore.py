@@ -188,7 +188,7 @@ class TankCore(object):
         Tells core to take plugin options and instantiate plugin classes
         """
         if super_job_id is not None:
-            logger.info('yandex tank load_plugins super_job_id = %s' % super_job_id)
+            logger.info('get super_job_id = %s' % super_job_id)
             os.environ['SUPERJOB_ID_test'] = super_job_id
 
         logger.info(self.get_user_agent())
