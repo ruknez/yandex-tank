@@ -189,7 +189,7 @@ class TankCore(object):
         """
         if super_job_id is not None:
             logger.info('get super_job_id = %s' % super_job_id)
-            os.environ['SUPERJOB_ID_test'] = super_job_id
+            os.environ['SUPERJOB_ID'] = super_job_id
 
         logger.info(self.get_user_agent())
         logger.info('New test id %s' % self.test_id)
