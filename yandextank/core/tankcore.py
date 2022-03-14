@@ -183,7 +183,7 @@ class TankCore(object):
             self._artifacts_base_dir = artifacts_base_dir
         return self._artifacts_base_dir
 
-    def load_plugins(self, super_job_id):
+    def load_plugins(self, super_job_id=None):
         """
         Tells core to take plugin options and instantiate plugin classes
         """
